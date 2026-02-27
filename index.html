@@ -34,6 +34,7 @@ body{
   display:grid;
   gap:20px;
   grid-template-columns: 640px 1fr;
+  align-items:start;
 }
 @media(max-width:960px){
   .layout{grid-template-columns:1fr}
@@ -66,9 +67,12 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:10px;
   z-index:2;
+  pointer-events:none;
 }
 .badge{
+  pointer-events:auto;
   padding:10px 14px;
   border-radius:999px;
   background:var(--glass);
@@ -82,6 +86,7 @@ body{
   text-overflow:ellipsis;
 }
 .btn{
+  pointer-events:auto;
   padding:10px 14px;
   border-radius:999px;
   background:rgba(0,0,0,.35);
@@ -91,8 +96,16 @@ body{
   font-weight:800;
   font-size:13px;
   text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
 }
-.ctaWrap{margin-top:14px}
+
+.ctaWrap{
+  margin-top:16px;
+  display:flex;
+  justify-content:center;
+}
 .cta{
   display:inline-flex;
   align-items:center;
@@ -116,7 +129,7 @@ body{
   text-transform:uppercase;
   font-size:18px;
 }
-.text{color:var(--muted);line-height:1.7}
+.text{color:var(--muted);line-height:1.7;margin:0}
 .coords{
   width:fit-content;
   padding:8px 12px;
@@ -132,80 +145,93 @@ body{
 
 <body>
 <main class="wrap">
-<div class="layout">
+  <div class="layout">
 
-<!-- LEFT -->
-<section class="card mapCard">
-  <div class="map">
-    <div class="mapOverlay">
-      <div class="badge" id="badgeText">📍</div>
-      <a class="btn" id="openMapsBtn" target="_blank">🗺️ Open Maps</a>
-    </div>
-    <iframe id="mapFrame" loading="lazy"></iframe>
+    <!-- LEFT: MAP -->
+    <section class="card mapCard">
+      <div class="map">
+        <div class="mapOverlay">
+          <div class="badge" id="badgeText">📍</div>
+          <a class="btn" id="openMapsBtn" target="_blank" rel="noopener">🗺️ Open Maps</a>
+        </div>
+
+        <iframe id="mapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+
+      <!-- ✅ STREET VIEW BUTTON UNDER MAP -->
+      <div class="ctaWrap">
+        <a class="cta" id="streetBtn" target="_blank" rel="noopener">
+          👣 Bekijk in Street View
+        </a>
+      </div>
+    </section>
+
+    <!-- RIGHT: INFO + INSTAGRAM -->
+    <aside class="card side">
+      <div class="logo">GIOIA MUNDO</div>
+
+      <p class="text">
+        You find the most amazing art on the streets all over the world.<br><br>
+        We simply love it and want to expose the art more by connecting it with streetwear.<br><br>
+        On the map you see the exact spot where the street art of your T is born,
+        and below you find the artist who created it.
+      </p>
+
+      <span class="coords" id="addrText"></span>
+
+      <div class="divider"></div>
+
+      <!-- INSTAGRAM POST -->
+      <div class="insta">
+        <blockquote class="instagram-media"
+          data-instgrm-permalink="https://www.instagram.com/p/CdeACLgqmZm/"
+          data-instgrm-version="14"
+          style="background:#fff;border-radius:14px;border:0;margin:0;max-width:100%;">
+        </blockquote>
+        <script async src="https://www.instagram.com/embed.js"></script>
+
+        <p style="margin-top:10px;font-size:13px;color:#b8bfd8;margin-bottom:0;">
+          Not loading? Open directly on
+          <a href="https://www.instagram.com/p/CdeACLgqmZm/"
+             target="_blank" rel="noopener" style="color:#0095f6;">
+            Instagram
+          </a>.
+        </p>
+      </div>
+    </aside>
+
   </div>
-
-  <div class="ctaWrap">
-    <a class="cta" id="streetBtn" target="_blank">
-      👣 Bekijk in Street View
-    </a>
-  </div>
-</section>
-
-<!-- RIGHT -->
-<aside class="card side">
-  <div class="logo">GIOIA MUNDO</div>
-
-  <p class="text">
-    You find the most amazing art on the streets all over the world.
-    We simply love it and connect it with streetwear.
-  </p>
-
-  <span class="coords" id="addrText"></span>
-  <div class="divider"></div>
-
-  <!-- INSTAGRAM POST -->
-  <div class="insta">
-    <blockquote class="instagram-media"
-      data-instgrm-permalink="https://www.instagram.com/p/CdeACLgqmZm/"
-      data-instgrm-version="14"
-      style="background:#fff;border-radius:14px;border:0;margin:0;max-width:100%;">
-    </blockquote>
-    <script async src="https://www.instagram.com/embed.js"></script>
-  </div>
-
-</aside>
-
-</div>
 </main>
 
 <script>
-// 📍 Exacte NDSM-Werf locatie uit jouw link
-const address = "NDSM-Werf, Amsterdam, Netherlands";
-const lat = 52.4006028;
-const lng = 4.8961185;
-const zoom = 19;
+  // 📍 Exacte NDSM-Werf locatie (uit jouw Street View link)
+  const address = "NDSM-Werf, Amsterdam, Netherlands";
+  const lat = 52.4006028;
+  const lng = 4.8961185;
+  const zoom = 19;
 
-// Street View exacte parameters uit jouw URL
-const heading = 195.19;
-const pitch = -2.32;
-const fov = 75;
-const panoId = "xrGHU2op3yJI6mWrBDDvUw";
+  // Street View parameters (uit jouw link)
+  const heading = 195.19;
+  const pitch = -2.32;
+  const fov = 75;
+  const panoId = "xrGHU2op3yJI6mWrBDDvUw";
 
-const openMapsUrl =
-  `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+  // Links
+  const openMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
-const streetViewUrl =
-  `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}` +
-  `&heading=${heading}&pitch=${pitch}&fov=${fov}&pano=${panoId}`;
+  const streetViewUrl =
+    `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}` +
+    `&heading=${heading}&pitch=${pitch}&fov=${fov}&pano=${panoId}`;
 
-const embedUrl =
-  `https://www.google.com/maps?output=embed&z=${zoom}&t=k&ll=${lat},${lng}`;
+  const mapEmbedUrl = `https://www.google.com/maps?output=embed&z=${zoom}&t=k&ll=${lat},${lng}`;
 
-document.getElementById("badgeText").textContent = `📍 ${address}`;
-document.getElementById("addrText").textContent = `${address} — ${lat}, ${lng}`;
-document.getElementById("openMapsBtn").href = openMapsUrl;
-document.getElementById("streetBtn").href = streetViewUrl;
-document.getElementById("mapFrame").src = embedUrl;
+  // UI
+  document.getElementById("badgeText").textContent = `📍 ${address}`;
+  document.getElementById("addrText").textContent = `${address} — ${lat}, ${lng}`;
+
+  document.getElementById("openMapsBtn").href = openMapsUrl;
+  document.getElementById("streetBtn").href = streetViewUrl;
+  document.getElementById("mapFrame").src = mapEmbedUrl;
 </script>
 
 </body>
