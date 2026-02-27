@@ -1,42 +1,155 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gioia Mundo</title>
+<meta name="description" content="Gioia Mundo — wereldse joy, minimalistisch design." />
+
+<style>
+:root{
+  --bg:#0b0c10;
+  --text:#f5f7ff;
+  --muted:#b8bfd8;
+  --line:#232843;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  color:var(--text);
+  background:
+    radial-gradient(900px 500px at 20% 10%, rgba(124,92,255,.22), transparent 60%),
+    radial-gradient(700px 500px at 90% 20%, rgba(46,229,157,.14), transparent 55%),
+    linear-gradient(180deg,#070810,var(--bg));
+}
+.wrap{max-width:1100px;margin:0 auto;padding:22px}
+.shell{
+  display:grid;
+  gap:14px;
+  grid-template-columns:1.35fr .65fr;
+  min-height:calc(100vh - 44px);
+}
+@media(max-width:920px){
+  .shell{grid-template-columns:1fr}
+}
+.card{
+  background:rgba(18,20,32,.72);
+  border:1px solid rgba(35,40,67,.75);
+  border-radius:26px;
+  overflow:hidden;
+}
+.mapWrap{position:relative;min-height:520px}
+.mapWrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.overlay{
+  position:absolute;left:14px;top:14px;right:14px;
+  display:flex;justify-content:space-between;gap:10px;
+  pointer-events:none;z-index:3;
+}
+.badge,.btn{
+  pointer-events:auto;
+  padding:9px 12px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(0,0,0,.35);
+  backdrop-filter:blur(10px);
+  font-weight:800;font-size:13px;
+  color:rgba(245,247,255,.92);
+  text-decoration:none;
+}
+.side{padding:18px;display:grid;gap:14px}
+.logo{
+  letter-spacing:.38em;
+  font-weight:500;
+  font-size:18px;
+}
+.muted{color:var(--muted);line-height:1.7}
+.pill{
+  padding:9px 12px;border-radius:999px;
+  border:1px solid var(--line);
+  font-size:13px;color:var(--muted);
+  width:fit-content;
+}
+.divider{height:1px;background:var(--line)}
+.insta{max-width:420px}
+</style>
+</head>
+
+<body>
+<main class="wrap">
+<div class="shell">
+
+<!-- MAP -->
+<section class="card">
+  <div class="mapWrap">
+    <div class="overlay">
+      <div class="badge" id="badgeText">📍</div>
+      <a class="btn" id="openMapsBtn" target="_blank">🗺 Open Maps</a>
+    </div>
+    <iframe id="mapFrame" loading="lazy"></iframe>
+  </div>
+</section>
+
+<!-- SIDE -->
+<aside class="card side">
+  <div class="logo">GIOIA MUNDO</div>
+
+  <p class="muted">
+    You find the most amazing art on the streets all over the world.
+    We simply love it and connect it with streetwear.
+  </p>
+
+  <span class="pill" id="addrText"></span>
+
+  <div class="divider"></div>
+
+  <!-- Instagram -->
+  <div class="insta">
+    <blockquote class="instagram-media"
+      data-instgrm-permalink="https://www.instagram.com/p/CdeACLgqmZm/"
+      data-instgrm-version="14"
+      style="background:#fff;border-radius:14px;border:0;margin:0;max-width:100%;">
+    </blockquote>
+    <script async src="https://www.instagram.com/embed.js"></script>
+  </div>
+
+  <a class="btn" id="streetBtn" target="_blank">
+    👣 Bekijk in Street View
+  </a>
+</aside>
+
+</div>
+</main>
+
 <script>
-  // 📍 NDSM-Werf (coördinaten uit jouw Street View link)
-  const address = "NDSM-Werf, Amsterdam, Netherlands";
-  const lat = 52.4006028;
-  const lng = 4.8961185;
-  const zoom = 19;
+// 📍 NDSM-Werf exacte locatie
+const address = "NDSM-Werf, Amsterdam, Netherlands";
+const lat = 52.4006028;
+const lng = 4.8961185;
+const zoom = 19;
 
-  // 👁️ Street View parameters uit jouw link
-  const heading = 195.19;   // yaw
-  const pitch   = -2.32;    // tilt
-  const fov     = 75;       // 75y in je link (ongeveer)
+// 👁 Street View parameters uit jouw link
+const heading = 195.19;
+const pitch = -2.32;
+const fov = 75;
+const panoId = "xrGHU2op3yJI6mWrBDDvUw";
 
-  // (optioneel maar handig) exact dezelfde Street View “foto”
-  const panoId = "xrGHU2op3yJI6mWrBDDvUw";
+// 🔗 Links
+const openMapsUrl =
+  `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
 
-  // 🔗 Links
-  const openMapsUrl =
-    `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+const streetViewUrl =
+  `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}&heading=${heading}&pitch=${pitch}&fov=${fov}&pano=${panoId}`;
 
-  // Street View: met panoId (super precies). Zonder panoId werkt ook, maar kan soms een andere opname kiezen.
-  const streetViewUrl =
-    `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${lat},${lng}` +
-    `&heading=${heading}&pitch=${pitch}&fov=${fov}&pano=${panoId}`;
+const embedUrl =
+  `https://www.google.com/maps?output=embed&z=${zoom}&t=k&ll=${lat},${lng}`;
 
-  // Satellite embed (t=k)
-  const mapEmbedUrl =
-    `https://www.google.com/maps?output=embed&z=${zoom}&t=k&ll=${lat},${lng}`;
-
-  // 🧩 UI invullen
-  const badgeEl = document.getElementById("badgeText");
-  const addrEl  = document.getElementById("addrText");
-  const mapsBtn = document.getElementById("openMapsBtn");
-  const svBtn   = document.getElementById("streetBtn");
-  const frameEl = document.getElementById("mapFrame");
-
-  if (badgeEl) badgeEl.textContent = `📍 ${address}`;
-  if (addrEl)  addrEl.textContent  = `${address} — ${lat}, ${lng}`;
-
-  if (mapsBtn) mapsBtn.href = openMapsUrl;
-  if (svBtn)   svBtn.href   = streetViewUrl;
-  if (frameEl) frameEl.src  = mapEmbedUrl;
+// Inject
+document.getElementById("badgeText").textContent = `📍 ${address}`;
+document.getElementById("addrText").textContent = `${address} — ${lat}, ${lng}`;
+document.getElementById("openMapsBtn").href = openMapsUrl;
+document.getElementById("streetBtn").href = streetViewUrl;
+document.getElementById("mapFrame").src = embedUrl;
 </script>
+
+</body>
+</html>
